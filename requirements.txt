@@ -1,0 +1,6 @@
+Pillow==7.2.0
+matplotlib~=3.3.0
+requests~=2.24.0
+setuptools~=49.2.1
+beautifulsoup4~=4.9.1
+geoip2~=4.0.2
