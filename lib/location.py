@@ -1,10 +1,9 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 import ssl
-import gzip
+import yaml
 from urllib.request import urlopen
 from json import load
-from io import BytesIO
 import geoip2.database
 
 
@@ -19,9 +18,20 @@ def get_ip():
     return ip
 
 
+def get_config_key(config):
+    try:
+        with open(config, encoding='utf-8') as f:
+            return yaml.safe_load(f)
+    except TypeError:
+        pass
+    except FileNotFoundError:
+        pass
+
+
 class Location:
     def __init__(self):
         self.ip = get_ip()
+        self.seven_days = None
         self.response = reader.city(self.ip)
 
     def Country_IsoCode(self):
@@ -83,19 +93,3 @@ class Location:
         :return: 返回经度
         """
         return self.response.location.longitude
-
-    @staticmethod
-    def city_search(key, location, adm=''):
-        """
-        可获取到需要查询城市的基本信息，包括城市或地区的Location ID（你需要这个ID去查询天气）
-        :param key: 用户认证key，例如 key=123456789ABC
-        :param location: 输入需要查询的城市名称，例如location=beijing
-        :param adm: 城市所属行政区划，例如adm=beijing
-        :return: 返回查询结果为Json格式数据
-        """
-        url = 'https://geoapi.heweather.net/v2/city/lookup?'
-        city = urlopen(url + f'key={key}&location={location}&adm={adm}').read()
-        buff = BytesIO(city)
-        f = gzip.GzipFile(fileobj=buff)
-        html = f.read().decode('utf-8')
-        return html
