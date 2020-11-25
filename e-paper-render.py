@@ -248,7 +248,7 @@ def weather_trend_draw():
     today_date.paste(images, (20, 365))
 
 
-def fetcher_errors(images, drafts, msg="咦？好像出错了呀！"):
+def fetcher_errors(images, drafts, msg="咦？设备好像出错了呀！"):
     img = Image.open(os.path.join(pic_dir, 'ERROR.bmp'))
     images.paste(img, (60, 20))
     drafts.text((100, 160), msg, font=font48, fill=0)
@@ -323,15 +323,15 @@ try:
     if len(condition.get('temp')) == 1:
         draw_weather.text((40, 150), condition.get('temp'), font=font72, fill=0)
         today_weather.paste(celsius1, (85, 160))
-        draw_weather.text((85, 190), air_quality(aqi['value']), font=font24, fill=0)
+        draw_weather.text((85, 190), air_quality(int(aqi['value'])), font=font24, fill=0)
     elif len(condition.get('temp')) == 2:
         draw_weather.text((40, 150), condition.get('temp'), font=font72, fill=0)
         today_weather.paste(celsius1, (120, 160))
-        draw_weather.text((120, 190), air_quality(aqi['value']), font=font24, fill=0)
+        draw_weather.text((120, 190), air_quality(int(aqi['value'])), font=font24, fill=0)
     else:
         draw_weather.text((40, 150), condition.get('temp'), font=font72, fill=0)
         today_weather.paste(celsius1, (140, 160))
-        draw_weather.text((140, 190), air_quality(aqi['value']), font=font24, fill=0)
+        draw_weather.text((140, 190), air_quality(int(aqi['value'])), font=font24, fill=0)
 
     # 显示未来四天天气状态图标
     # 显示室内温度湿度
