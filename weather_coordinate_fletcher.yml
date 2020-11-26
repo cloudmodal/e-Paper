@@ -9,7 +9,7 @@
   image_left: 124
   image_right: 243
   icon:
-  weather_icon_left: 50
+  weather_icon_left: 70
   weather_icon_right: 30
 - temp_left: 250
   temp_right: 240
@@ -19,10 +19,10 @@
   wind_right: 300
   h_left: 255
   h_right: 333
-  image_left: 330
+  image_left: 340
   image_right: 243
   icon:
-  weather_icon_left: 230
+  weather_icon_left: 260
   weather_icon_right: 110
 - temp_left: 410
   temp_right: 240
@@ -35,7 +35,7 @@
   image_left: 490
   image_right: 243
   icon:
-  weather_icon_left: 390
+  weather_icon_left: 430
   weather_icon_right: 110
 - temp_left: 570
   temp_right: 240
@@ -48,7 +48,7 @@
   image_left: 650
   image_right: 243
   icon:
-  weather_icon_left: 550
+  weather_icon_left: 590
   weather_icon_right: 110
 - temp_left: 730
   temp_right: 240
@@ -61,5 +61,5 @@
   image_left: 810
   image_right: 243
   icon:
-  weather_icon_left: 710
+  weather_icon_left: 740
   weather_icon_right: 110

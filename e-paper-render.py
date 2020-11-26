@@ -316,35 +316,6 @@ try:
     draw_date.text((740, 50), f'{get_prior_date(4).month}月{get_prior_date(4).day}日', font=font24, fill=0)
     draw_date.text((750, 80), f'{get_week_day(get_prior_date(4))}', font=font24, fill=0)
 
-    draw_weather.text((10, 160), '室', font=font24, fill=0)
-    draw_weather.text((10, 190), '外', font=font24, fill=0)
-    celsius1 = Image.open(os.path.join(pic_dir, 'CELSIUS.BMP'))
-
-    if len(condition.get('temp')) == 1:
-        draw_weather.text((40, 150), condition.get('temp'), font=font72, fill=0)
-        today_weather.paste(celsius1, (85, 160))
-        draw_weather.text((85, 190), air_quality(int(aqi['value'])), font=font24, fill=0)
-    elif len(condition.get('temp')) == 2:
-        draw_weather.text((40, 150), condition.get('temp'), font=font72, fill=0)
-        today_weather.paste(celsius1, (120, 160))
-        draw_weather.text((120, 190), air_quality(int(aqi['value'])), font=font24, fill=0)
-    else:
-        draw_weather.text((40, 150), condition.get('temp'), font=font72, fill=0)
-        today_weather.paste(celsius1, (140, 160))
-        draw_weather.text((140, 190), air_quality(int(aqi['value'])), font=font24, fill=0)
-
-    # 显示未来四天天气状态图标
-    # 显示室内温度湿度
-    # temp = room_temp()['temp']
-    # humidity = room_temp()['humidity']
-
-    # 显示室外温度
-    # draw_weather.text((75, 160), '室', font=font24, fill=0)
-    # draw_weather.text((75, 190), '内', font=font24, fill=0)
-    # draw_weather.text((140, 150), temp, font=font72, fill=0)
-    # celsius1 = Image.open(os.path.join(pic_dir, 'CELSIUS.BMP'))
-    # today_weather.paste(celsius1, (220, 165))
-
     # 绘制一条红色区域
     draw_weather.rectangle((40, 330, 850, 360), outline=0, fill=0)
     # 气温数据
@@ -367,6 +338,33 @@ try:
             draw_date, draw_weather, today_date,
             coordinate=item
         )
+
+    draw_weather.text((30, 130), '室', font=font24, fill=0)
+    draw_weather.text((30, 170), '外', font=font24, fill=0)
+    celsius1 = Image.open(os.path.join(pic_dir, 'CELSIUS.BMP'))
+
+    aqq = air_quality(int(aqi['value']))
+    if len(condition.get('temp')) == 1:
+        draw_weather.text((60, 120), condition.get('temp'), font=font72, fill=0)
+        today_weather.paste(celsius1, (105, 130))
+        draw_weather.text((105, 160), aqq, font=font24, fill=0)
+    elif len(condition.get('temp')) == 2:
+        draw_weather.text((60, 140), condition.get('temp'), font=font72, fill=0)
+        today_weather.paste(celsius1, (140, 150))
+        draw_weather.text((140, 180), aqq, font=font24, fill=0)
+    else:
+        draw_weather.text((60, 140), condition.get('temp'), font=font72, fill=0)
+        today_weather.paste(celsius1, (180, 150))
+        draw_weather.text((180, 180), aqq, font=font24, fill=0)
+
+    # 显示室内温度
+    heat_img = Image.open(os.path.join(pic_dir, 'HEAT.bmp'))
+    today_weather.paste(heat_img, (30, 200))
+    draw_weather.text((60, 200), room_temp()['temp'] + '℃', font=font24, fill=0)
+    # 显示室内湿度
+    humidity_img = Image.open(os.path.join(pic_dir, 'HUMIDITY.bmp'))
+    today_date.paste(humidity_img, (150, 200))
+    draw_date.text((180, 200), room_temp()['humidity'] + '%', font=font24, fill=0)
 
     logging.info("获取未来24小时气温")
     # 获取24小时气温数据
