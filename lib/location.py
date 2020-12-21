@@ -1,16 +1,17 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import os
 import ssl
 import yaml
 from urllib.request import urlopen
 from json import load
 import geoip2.database
 
-
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 ssl._create_default_https_context = ssl._create_unverified_context
 
 
-reader = geoip2.database.Reader('GeoLite2-City.mmdb')
+reader = geoip2.database.Reader(os.path.join(BASE_DIR, 'GeoLite2-City.mmdb'))
 
 
 def get_ip():

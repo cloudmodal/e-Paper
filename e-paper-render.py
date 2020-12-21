@@ -4,20 +4,30 @@ import os
 import sys
 import json
 import yaml
-import logging
 import requests
 import pylab as plt
 import requests.utils
 from skimage import io
 from datetime import datetime
 import matplotlib.font_manager as fm
-from indoor_sensor import room_temp
+from indoor_sensor import SHT30
 from lib.location import Location
 from weather_time_render import (
     weather, get_weather_fettle, get_prior_date, get_week_day
 )
-from lib import EPD
+from lib import EPD, Logger
 from PIL import Image, ImageDraw, ImageFont
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+LOG_DIR = os.path.join(BASE_DIR, 'logs')
+LOG_FILE = os.path.join(LOG_DIR, 'e-Paper.log')
+if not os.path.isdir(LOG_DIR):
+    os.makedirs(LOG_DIR)
+
+logger = Logger(LOG_FILE, level='debug').logger
+
+# 获取传感器温度
+sht30 = SHT30()
 
 pic_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'pic')
 lib_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib')
@@ -26,7 +36,6 @@ lib_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'lib')
 if os.path.exists(lib_dir):
     sys.path.append(lib_dir)
 
-logging.basicConfig(level=logging.WARNING)
 now_date = datetime.now()
 
 
@@ -257,12 +266,12 @@ def fetcher_errors(images, drafts, msg="咦？设备好像出错了呀！"):
 
 try:
     # 读取天气位置坐标配置
-    weather_coordinate = open_fletcher('weather_coordinate_fletcher.yml')
-    logging.info('加载位置信息...')
+    weather_coordinate = open_fletcher(os.path.join(BASE_DIR, 'weather_coordinate_fletcher.yml'))
+    logger.info('加载位置信息...')
     location = Location()
     Latitude = location.Location_Latitude()
     Longitude = location.Location_Longitude()
-    logging.info('位置信息加载成功，正在获取天气信息...')
+    logger.info('位置信息加载成功，正在获取天气信息...')
     # 获取天气实况
     weather_fletcher = weather(Latitude, Longitude, 'condition')
     # 获取7天预报
@@ -273,10 +282,11 @@ try:
     condition = weather_fletcher.get('condition')
 
     epd = EPD()
-    logging.info("墨水屏初始化过程中")
+    logger.info("墨水屏正在初始化")
     epd.init()
-    logging.info('清理屏幕旧信息')
+    logger.info('清理屏幕旧信息')
     epd.Clear()
+    logger.info('屏幕信息清理完成')
 
     # 字体大小
     font24 = ImageFont.truetype(os.path.join(pic_dir, 'AdobeKaitiStd-Regular.otf'), 24)
@@ -285,7 +295,7 @@ try:
     font48 = ImageFont.truetype(os.path.join(pic_dir, 'AdobeKaitiStd-Regular.otf'), 48)
 
     # Drawing on the Horizontal image
-    logging.info("Drawing on the Horizontal image...")
+    logger.info("Drawing on the Horizontal image...")
     """
     定义一个图像缓存，以方便在图片上进行画图、写字等功能
     第一个参数定义图片的颜色深度，定义为1说明是2位图
@@ -298,14 +308,15 @@ try:
     # 创建一个基于image的画图对象，所有的画图操作都在这个对象上
     draw_date = ImageDraw.Draw(today_date)
     draw_weather = ImageDraw.Draw(today_weather)
-
+    logger.info('创建一个基于image的画图对象')
     # 获取未来五天的日期
     m = now_date.month
     d = now_date.day
     w = get_week_day(now_date)
 
-    draw_date.text((10, 1), f'今天是：{m}月{d}日 {w} ({now_date.strftime("%H:%M")}更新)', font=font24, fill=0)
+    draw_date.text((10, 2), f'今天是：{m}月{d}日 {w} ({now_date.strftime("%H:%M")}更新)', font=font24, fill=0)
     # 获取今日天气提示
+    logger.info('获取今日天气提示')
     draw_date.text((430, 1), condition.get('tips'), font=font24, fill=0)
     draw_date.text((260, 50), f'{get_prior_date(1).month}月{get_prior_date(1).day}日', font=font24, fill=0)
     draw_date.text((270, 80), f'{get_week_day(get_prior_date(1))}', font=font24, fill=0)
@@ -315,9 +326,9 @@ try:
     draw_date.text((590, 80), f'{get_week_day(get_prior_date(3))}', font=font24, fill=0)
     draw_date.text((740, 50), f'{get_prior_date(4).month}月{get_prior_date(4).day}日', font=font24, fill=0)
     draw_date.text((750, 80), f'{get_week_day(get_prior_date(4))}', font=font24, fill=0)
-
     # 绘制一条红色区域
     draw_weather.rectangle((40, 330, 850, 360), outline=0, fill=0)
+    logger.info('绘制一条红色区域')
     # 气温数据
     for idx, item in enumerate(weather_coordinate):
         if idx == 0:
@@ -338,7 +349,7 @@ try:
             draw_date, draw_weather, today_date,
             coordinate=item
         )
-
+    logger.info('获取天气信息成功！')
     draw_weather.text((30, 130), '室', font=font24, fill=0)
     draw_weather.text((30, 170), '外', font=font24, fill=0)
     celsius1 = Image.open(os.path.join(pic_dir, 'CELSIUS.BMP'))
@@ -349,24 +360,28 @@ try:
         today_weather.paste(celsius1, (105, 130))
         draw_weather.text((105, 160), aqq, font=font24, fill=0)
     elif len(condition.get('temp')) == 2:
-        draw_weather.text((60, 140), condition.get('temp'), font=font72, fill=0)
-        today_weather.paste(celsius1, (140, 150))
-        draw_weather.text((140, 180), aqq, font=font24, fill=0)
+        draw_weather.text((60, 120), condition.get('temp'), font=font72, fill=0)
+        today_weather.paste(celsius1, (140, 130))
+        draw_weather.text((140, 160), aqq, font=font24, fill=0)
     else:
         draw_weather.text((60, 140), condition.get('temp'), font=font72, fill=0)
-        today_weather.paste(celsius1, (180, 150))
+        today_weather.paste(celsius1, (180, 130))
         draw_weather.text((180, 180), aqq, font=font24, fill=0)
 
     # 显示室内温度
+    sht30.write_command()
+    result = sht30.read_data()
+    h = " %.1f" % (result['h'])
+    c = " %.1f" % (result['c'])
     heat_img = Image.open(os.path.join(pic_dir, 'HEAT.bmp'))
     today_weather.paste(heat_img, (30, 200))
-    draw_weather.text((60, 200), room_temp()['temp'] + '℃', font=font24, fill=0)
+    draw_weather.text((60, 200), c + '℃', font=font24, fill=0)
     # 显示室内湿度
     humidity_img = Image.open(os.path.join(pic_dir, 'HUMIDITY.bmp'))
     today_date.paste(humidity_img, (150, 200))
-    draw_date.text((180, 200), room_temp()['humidity'] + '%', font=font24, fill=0)
+    draw_date.text((180, 200), h + '%', font=font24, fill=0)
 
-    logging.info("获取未来24小时气温")
+    logger.info("获取未来24小时气温")
     # 获取24小时气温数据
     weather_trend_draw()
     epd.display(epd.getbuffer(today_date), epd.getbuffer(today_weather))
@@ -377,7 +392,7 @@ except IndexError as e:
     draw = ImageDraw.Draw(image)
     fetcher_errors(image, draw)
     epd.display(epd.getbuffer(image), epd.getbuffer(image))
-    logging.error(e)
+    logger.error(e)
 
 except TypeError as e:
     epd = EPD()
@@ -385,7 +400,7 @@ except TypeError as e:
     draw = ImageDraw.Draw(image)
     fetcher_errors(image, draw)
     epd.display(epd.getbuffer(image), epd.getbuffer(image))
-    logging.error(e)
+    logger.error(e)
 
 except FileNotFoundError as e:
     epd = EPD()
@@ -393,7 +408,7 @@ except FileNotFoundError as e:
     draw = ImageDraw.Draw(image)
     fetcher_errors(image, draw)
     epd.display(epd.getbuffer(image), epd.getbuffer(image))
-    logging.error(e)
+    logger.error(e)
 
 except IOError as e:
     epd = EPD()
@@ -401,10 +416,10 @@ except IOError as e:
     draw = ImageDraw.Draw(image)
     fetcher_errors(image, draw)
     epd.display(epd.getbuffer(image), epd.getbuffer(image))
-    logging.error(e)
+    logger.error(e)
 
 except KeyboardInterrupt:
     epd = EPD()
-    logging.info("ctrl + c:")
+    logger.info("ctrl + c:")
     epd.module_exit()
     exit()

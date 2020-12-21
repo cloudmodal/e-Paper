@@ -55,7 +55,7 @@ def weather(latitude, longitude, forecast):
 
     Header = {
             "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-            "Authorization": "APPCODE 2c1c7b1e6ff74ae494c3a6b48036a565"
+            "Authorization": "APPCODE 2c1c7b1e6ff74ae494c3a6b48036af77"
         }
     body = {
         'lat': latitude,
