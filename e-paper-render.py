@@ -365,8 +365,8 @@ try:
         draw_weather.text((150, 160), aqq, font=font24, fill=0)
     else:
         draw_weather.text((60, 140), condition.get('temp'), font=font72, fill=0)
-        today_weather.paste(celsius1, (180, 130))
-        draw_weather.text((180, 200), aqq, font=font24, fill=0)
+        today_weather.paste(celsius1, (195, 130))
+        draw_weather.text((195, 200), aqq, font=font24, fill=0)
 
     # 显示室内温度
     sht30.write_command()
