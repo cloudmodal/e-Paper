@@ -231,14 +231,14 @@ def corp_margin(im):
             raw_down = r
             break
 
-    for c in range(0, col):
-        if img2.sum(axis=0)[c] < 760 * row:
-            col_top = c
+    for s in range(0, col):
+        if img2.sum(axis=0)[s] < 760 * row:
+            col_top = s
             break
 
-    for c in range(col - 1, 0, -1):
-        if img2.sum(axis=0)[c] < 700 * row:
-            col_down = c
+    for x in range(col - 1, 0, -1):
+        if img2.sum(axis=0)[x] < 700 * row:
+            col_down = x
             break
 
     new_img = im[row_top:raw_down + 1, col_top:col_down + 1, 0:3]
