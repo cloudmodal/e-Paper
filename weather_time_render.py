@@ -31,9 +31,9 @@ def get_week_day(date):
 
 def get_weather_fettle(cw):
     bmp_name = {
-        u'晴': 'WQING1.BMP', u'阴': 'WYIN.BMP', u'多云': 'WDYZQ.BMP', u'雨': 'WYU.BMP',
-        u'雷阵雨': 'WLZYU.BMP', u'小雨': 'WQING1.BMP', u'中雨': 'WQING1.BMP', u'大雨': 'WQING1.BMP',
-        u'雪': 'WXUE.BMP', u'雹': 'WBBAO.BMP'
+        u'晴': 'WQING.BMP', u'阴': 'WYIN.BMP', u'多云': 'WDYZQ.BMP', u'雨': 'WYU.BMP',
+        u'雷阵雨': 'WLZYU.BMP', u'小雨': 'WXYU.BMP', u'中雨': 'WZYU.BMP', u'大雨': 'WDYU.BMP',
+        u'雪': 'WXUE.BMP', u'雹': 'WBIBAO.BMP', u'霾': 'WUMAI.BMP'
     }.get(cw, None)
 
     if not bmp_name:
