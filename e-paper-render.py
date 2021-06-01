@@ -198,7 +198,7 @@ def forecast_24hours_temp(hours, temps):
     plt.figure(figsize=(10.4, 1.7), dpi=100)
     # 设置字体,用来正常显示中文标签
     font = fm.FontProperties(fname=os.path.join(pic_dir, 'AdobeKaitiStd-Regular.otf'), size=12)
-    plt.plot(hours, temps, label='未来24小时温度变化', color='r', linewidth=2.0, linestyle='-.')
+    plt.plot(hours, temps, label='未来12小时温度变化', color='r', linewidth=2.0, linestyle='-.')
     plt.legend(prop=font)
     plt.savefig(os.path.join(pic_dir, file_name), transparent=True)
     # 转换格式
